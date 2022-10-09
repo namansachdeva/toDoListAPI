@@ -1,7 +1,6 @@
-import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
-import chalk from 'chalk';
-
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import { logger } from '../utils/logger.js';
 
 dotenv.config();
 
@@ -12,17 +11,14 @@ const options = {
   useUnifiedTopology: true,
 };
 
-const client = new MongoClient(MONGO_URI, options);
-
 const connectDB = async () => {
   try {
-    await client.connect();
-    console.log(chalk.greenBright("Connected to DB"));
+    const conn = await mongoose.connect(MONGO_URI, options);
+    logger.info(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.log(chalk.redBright(error));
+    logger.error(`Error connecting to database`, error.message);
+    throw error;
   }
-}
+};
 
-const db = client.db("Tododb");
-
-export { connectDB, db };
+export default connectDB;

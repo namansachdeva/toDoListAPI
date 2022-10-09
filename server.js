@@ -1,22 +1,20 @@
 'use strict';
 import express from 'express';
 import dotenv from 'dotenv';
-import { connectDB } from './api/config/db.js';
-import morgan from 'morgan';
+import connectDB from './api/config/db.js';
 import { notFound, errorHandler } from './api/middlewares/error.middlewares.js';
-import routes from './api/routes/index.js';
+import todoRoutes from './api/routes/index.js';
 import chalk from 'chalk';
+import { requestLogger } from './api/utils/logger.js';
 
 dotenv.config();
 
 const app = express();
 
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(requestLogger);
 
 const PORT = process.env.PORT || 1337;
 
@@ -44,7 +42,7 @@ const main = async () => {
 
   connectDB();
 
-  routes(app);
+  app.use('/api/todos', todoRoutes);
 
   app.use(notFound);
   app.use(errorHandler);

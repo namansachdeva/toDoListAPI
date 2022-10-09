@@ -1,24 +1,35 @@
-'use strict';
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 
+const { Schema, model } = mongoose;
 
-var TaskSchema = new Schema({
-  name: {
-    type: String,
-    Required: 'Kindly enter the name of the task'
-  },
-  Created_date: {
-    type: Date,
-    default: Date.now
-  },
-  status: {
-    type: [{
+const STATUS = ['pending', 'in-progress', 'done'];
+
+const todoListSchema = new Schema(
+  {
+    name: {
       type: String,
-      enum: ['pending', 'ongoing', 'completed']
-    }],
-    default: ['pending']
+      required: [true, 'Please provide a name'],
+      trim: true,
+      maxlength: [40, 'Name cannot be more than 40 characters'],
+    },
+    description: {
+      type: String,
+      required: [true, 'Please provide a description'],
+      trim: true,
+      maxlength: [200, 'Description cannot be more than 200 characters'],
+    },
+    status: {
+      type: String,
+      enum: STATUS,
+      default: 'pending',
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
   }
-});
+);
 
-module.exports = mongoose.model('Tasks', TaskSchema);
+const TodoList = model('TodoList', todoListSchema);
+
+export default TodoList;
